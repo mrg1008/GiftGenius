@@ -1,8 +1,9 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, send_from_directory, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_cors import CORS
 from sqlalchemy.orm import DeclarativeBase
 
 class Base(DeclarativeBase):
@@ -13,8 +14,10 @@ login_manager = LoginManager()
 migrate = Migrate()
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='frontend/build', static_url_path='')
     app.config.from_object('config.Config')
+
+    CORS(app)
 
     db.init_app(app)
     login_manager.init_app(app)
@@ -36,9 +39,17 @@ def create_app():
     from feedback import feedback as feedback_blueprint
     app.register_blueprint(feedback_blueprint)
 
-    @app.route('/')
-    def home():
-        return render_template('home.html')
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve(path):
+        if path != "" and os.path.exists(app.static_folder + '/' + path):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, 'index.html')
+
+    @app.route('/api/hello')
+    def hello():
+        return jsonify(message="Hello from Flask!")
 
     from models import User
 
