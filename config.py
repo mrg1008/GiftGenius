@@ -11,3 +11,7 @@ class Config:
     AMAZON_ACCESS_KEY = os.environ.get('AMAZON_ACCESS_KEY')
     AMAZON_SECRET_KEY = os.environ.get('AMAZON_SECRET_KEY')
     AMAZON_ASSOCIATE_TAG = os.environ.get('AMAZON_ASSOCIATE_TAG')
+    
+    # Google OAuth config
+    GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
+    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')

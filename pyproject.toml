@@ -12,4 +12,6 @@ dependencies = [
     "flask-migrate>=4.0.7",
     "boto3>=1.35.39",
     "botocore>=1.35.39",
+    "flask-dance>=7.1.0",
+    "sqlalchemy>=2.0.35",
 ]

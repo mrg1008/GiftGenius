@@ -20,8 +20,9 @@ def create_app():
     login_manager.init_app(app)
     migrate.init_app(app, db)
 
-    from auth import auth as auth_blueprint
+    from auth import auth as auth_blueprint, init_google_oauth
     app.register_blueprint(auth_blueprint)
+    init_google_oauth(app)
 
     from events import events as events_blueprint
     app.register_blueprint(events_blueprint)
