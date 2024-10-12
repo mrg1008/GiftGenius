@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>User Profile</h2>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ current_user.name }}</h5>
+        <p class="card-text">Email: {{ current_user.email }}</p>
+    </div>
+</div>
+
+<h3 class="mt-4">Recipients</h3>
+<div id="recipients-list" class="row">
+    {% for recipient in current_user.recipients %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ recipient.name }}</h5>
+                <p class="card-text">Age Group: {{ recipient.age_group }}</p>
+                <p class="card-text">Interests: {{ recipient.interests }}</p>
+                <p class="card-text">Relationship: {{ recipient.relationship }}</p>
+                <button class="btn btn-sm btn-primary edit-recipient" data-id="{{ recipient.id }}">Edit</button>
+                <button class="btn btn-sm btn-danger delete-recipient" data-id="{{ recipient.id }}">Delete</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<button id="add-recipient" class="btn btn-success mt-3">Add Recipient</button>
+
+<div id="recipient-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add/Edit Recipient</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="recipient-form">
+                    <input type="hidden" id="recipient-id">
+                    <div class="mb-3">
+                        <label for="recipient-name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="recipient-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-age-group" class="form-label">Age Group</label>
+                        <select class="form-select" id="recipient-age-group" required>
+                            <option value="">Select age group</option>
+                            <option value="child">Child</option>
+                            <option value="teen">Teen</option>
+                            <option value="adult">Adult</option>
+                            <option value="senior">Senior</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-interests" class="form-label">Interests</label>
+                        <input type="text" class="form-control" id="recipient-interests">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-relationship" class="form-label">Relationship</label>
+                        <input type="text" class="form-control" id="recipient-relationship">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-recipient">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/recipients.js') }}"></script>
+{% endblock %}
