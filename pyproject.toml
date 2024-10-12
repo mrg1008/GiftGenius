@@ -15,4 +15,6 @@ dependencies = [
     "flask-dance>=7.1.0",
     "sqlalchemy>=2.0.35",
     "flask-cors>=5.0.0",
+    "ebaysdk>=2.2.0",
+    "etsy-python>=1.0.14",
 ]

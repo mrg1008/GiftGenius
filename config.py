@@ -15,3 +15,10 @@ class Config:
     # Google OAuth config
     GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
+
+    # Etsy API config
+    ETSY_API_KEY = os.environ.get('ETSY_API_KEY')
+    ETSY_OAUTH_SECRET = os.environ.get('ETSY_OAUTH_SECRET')
+
+    # eBay API config
+    EBAY_APP_ID = os.environ.get('EBAY_APP_ID')
