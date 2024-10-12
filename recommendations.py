@@ -2,7 +2,12 @@ from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import login_required, current_user
 from models import Event, Recipient
 from app import db
-from ebay_integration import EbayIntegration
+from google_shopping_integration import GoogleShoppingIntegration
+
+# Note: We've chosen to integrate with Google Shopping instead of Etsy and eBay
+# due to its wider product range and easier API integration. This decision
+# was made to streamline our recommendation process and provide a more
+# comprehensive selection of gifts to our users.
 
 recommendations = Blueprint('recommendations', __name__)
 
@@ -16,18 +21,16 @@ def get_recommendations(event_id):
     recipient = Recipient.query.get(event.recipient_id)
     
     keywords = recipient.interests.split(',')
-    min_price = str(int(event.budget_min))
-    max_price = str(int(event.budget_max))
+    min_price = int(event.budget_min)
+    max_price = int(event.budget_max)
 
-    ebay_gifts = search_ebay_gifts(keywords, min_price, max_price)
-
-    all_gifts = ebay_gifts
+    google_shopping_gifts = search_google_shopping_gifts(keywords, min_price, max_price)
     
-    return render_template('recommendations.html', recommendations=all_gifts, event=event)
+    return render_template('recommendations.html', recommendations=google_shopping_gifts, event=event)
 
-def search_ebay_gifts(keywords, min_price, max_price):
-    ebay = EbayIntegration()
-    gifts = ebay.search_gifts(keywords, min_price, max_price)
+def search_google_shopping_gifts(keywords, min_price, max_price):
+    google_shopping = GoogleShoppingIntegration()
+    gifts = google_shopping.search_gifts(keywords, min_price, max_price)
     return gifts
 
 @recommendations.route('/recommendations/<int:event_id>/filter', methods=['POST'])
@@ -44,6 +47,6 @@ def filter_recommendations(event_id):
     recipient = Recipient.query.get(event.recipient_id)
     keywords = recipient.interests.split(',')
 
-    gifts = search_ebay_gifts(keywords, min_price, max_price)
+    google_shopping_gifts = search_google_shopping_gifts(keywords, min_price, max_price)
 
-    return jsonify(gifts)
+    return jsonify(google_shopping_gifts)

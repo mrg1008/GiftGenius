@@ -1,16 +1,17 @@
-from ebay_integration import EbayIntegration
+from etsy_integration import EtsyIntegration
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_ebay_search():
+def test_etsy_search():
     try:
-        ebay = EbayIntegration()
+        etsy = EtsyIntegration()
         
         # Test case 1: Basic search
         logger.info("Test case 1 - Basic search:")
-        results = ebay.search_gifts(['watch'], '10', '100', 5)
+        results = etsy.search_gifts(['necklace'], '10', '100', 5)
         logger.info(f"Number of results: {len(results)}")
         for item in results:
             logger.info(f"Title: {item['title']}, Price: {item['price']} {item['currency_code']}")
@@ -18,7 +19,7 @@ def test_ebay_search():
 
         # Test case 2: Multiple keywords
         logger.info("Test case 2 - Multiple keywords:")
-        results = ebay.search_gifts(['vintage', 'camera'], '50', '200', 3)
+        results = etsy.search_gifts(['handmade', 'scarf'], '20', '150', 3)
         logger.info(f"Number of results: {len(results)}")
         for item in results:
             logger.info(f"Title: {item['title']}, Price: {item['price']} {item['currency_code']}")
@@ -26,7 +27,7 @@ def test_ebay_search():
 
         # Test case 3: Higher price range
         logger.info("Test case 3 - Higher price range:")
-        results = ebay.search_gifts(['laptop'], '500', '1000', 4)
+        results = etsy.search_gifts(['artwork'], '200', '500', 4)
         logger.info(f"Number of results: {len(results)}")
         for item in results:
             logger.info(f"Title: {item['title']}, Price: {item['price']} {item['currency_code']}")
@@ -37,4 +38,4 @@ def test_ebay_search():
         logger.error(f"Unexpected error occurred: {str(e)}")
 
 if __name__ == "__main__":
-    test_ebay_search()
+    test_etsy_search()

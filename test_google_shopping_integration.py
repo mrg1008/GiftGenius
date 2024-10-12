@@ -1,16 +1,16 @@
-from ebay_integration import EbayIntegration
+from google_shopping_integration import GoogleShoppingIntegration
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_ebay_search():
+def test_google_shopping_search():
     try:
-        ebay = EbayIntegration()
+        google_shopping = GoogleShoppingIntegration()
         
         # Test case 1: Basic search
         logger.info("Test case 1 - Basic search:")
-        results = ebay.search_gifts(['watch'], '10', '100', 5)
+        results = google_shopping.search_gifts(['watch'], 50, 200, 5)
         logger.info(f"Number of results: {len(results)}")
         for item in results:
             logger.info(f"Title: {item['title']}, Price: {item['price']} {item['currency_code']}")
@@ -18,7 +18,7 @@ def test_ebay_search():
 
         # Test case 2: Multiple keywords
         logger.info("Test case 2 - Multiple keywords:")
-        results = ebay.search_gifts(['vintage', 'camera'], '50', '200', 3)
+        results = google_shopping.search_gifts(['handmade', 'scarf'], 20, 150, 3)
         logger.info(f"Number of results: {len(results)}")
         for item in results:
             logger.info(f"Title: {item['title']}, Price: {item['price']} {item['currency_code']}")
@@ -26,15 +26,13 @@ def test_ebay_search():
 
         # Test case 3: Higher price range
         logger.info("Test case 3 - Higher price range:")
-        results = ebay.search_gifts(['laptop'], '500', '1000', 4)
+        results = google_shopping.search_gifts(['laptop'], 500, 1000, 4)
         logger.info(f"Number of results: {len(results)}")
         for item in results:
             logger.info(f"Title: {item['title']}, Price: {item['price']} {item['currency_code']}")
 
-    except ValueError as ve:
-        logger.error(f"Configuration Error: {str(ve)}")
     except Exception as e:
         logger.error(f"Unexpected error occurred: {str(e)}")
 
 if __name__ == "__main__":
-    test_ebay_search()
+    test_google_shopping_search()
