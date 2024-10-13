@@ -42,6 +42,13 @@ def create_app():
     from group_gifts import group_gifts as group_gifts_blueprint
     app.register_blueprint(group_gifts_blueprint)
 
+    from analytics import analytics
+
+    @app.before_request
+    def before_request():
+        if current_user.is_authenticated:
+            analytics.track_page_view(current_user.id)
+
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve(path):

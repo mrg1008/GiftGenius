@@ -15,11 +15,29 @@
                     <h5 class="card-title">{{ gift.title }}</h5>
                     <p class="card-text">{{ gift.price }} {{ gift.currency_code }}</p>
                     <p class="card-text"><small class="text-muted">Source: {{ gift.source }}</small></p>
-                    <a href="{{ gift.url }}" class="btn btn-primary" target="_blank">View on {{ gift.source }}</a>
+                    <a href="{{ gift.url }}" class="btn btn-primary recommendation-link" data-gift-id="{{ gift.id }}" target="_blank">View on {{ gift.source }}</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const recommendationLinks = document.querySelectorAll('.recommendation-link');
+    recommendationLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+            const giftId = this.getAttribute('data-gift-id');
+            fetch('/track_recommendation_click', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ gift_id: giftId }),
+            });
+        });
+    });
+});
+</script>
 {% endblock %}
