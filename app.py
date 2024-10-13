@@ -1,7 +1,7 @@
 import os
 from flask import Flask, send_from_directory, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_cors import CORS
 from sqlalchemy.orm import DeclarativeBase

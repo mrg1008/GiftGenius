@@ -35,6 +35,10 @@ args = "Test Recommendations"
 task = "workflow.run"
 args = "Test Gift Options"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Run Referral Tests"
+
 [[workflows.workflow]]
 name = "Start Flask App"
 author = "agent"
@@ -101,6 +105,17 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python test_gift_options.py"
+
+[[workflows.workflow]]
+name = "Run Referral Tests"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m unittest test_referral.py"
 
 [deployment]
 run = ["sh", "-c", "python main.py"]

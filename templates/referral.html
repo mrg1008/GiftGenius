@@ -2,33 +2,81 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Your Referral Code</h2>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Share your referral code with friends</h5>
-            <p class="card-text">Your unique referral code is: <strong>{{ referral_code }}</strong></p>
-            <p class="card-text">Share this code with your friends and earn rewards when they sign up!</p>
+    <h2 class="mb-4">Referral Program</h2>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">How it works</h5>
+                    <p class="card-text">Invite your friends to join our platform using your unique referral code. For each successful referral, you'll earn rewards!</p>
+                    <p class="card-text">Current rewards: 1 point per referral</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Your Referral Code</h5>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ current_user.referral_code }}" id="referralCode" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyReferralCode()">Copy</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="shareReferralCode()">Share via Email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Your Referral Stats</h5>
+                    <p class="card-text">Total Referrals: {{ current_user.referral_count }}</p>
+                    <p class="card-text">Points Earned: {{ current_user.referral_count }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <h3 class="mt-4">Your Referrals</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for referral in current_user.referrals_made %}
-            <tr>
-                <td>{{ referral.referred.name }}</td>
-                <td>{{ referral.date.strftime('%Y-%m-%d') }}</td>
-                <td>{{ referral.status }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h3 class="mb-3">Your Referrals</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for referral in current_user.referrals_made %}
+                <tr>
+                    <td>{{ referral.referred.name }}</td>
+                    <td>{{ referral.date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ referral.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<script>
+function copyReferralCode() {
+    var copyText = document.getElementById("referralCode");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("Referral code copied to clipboard: " + copyText.value);
+}
+
+function shareReferralCode() {
+    var referralCode = document.getElementById("referralCode").value;
+    var subject = "Join me on the Gifting Recommendation Platform!";
+    var body = "Hey! I think you'd love this gifting platform. Use my referral code to sign up: " + referralCode;
+    var mailtoLink = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    window.location.href = mailtoLink;
+}
+</script>
 {% endblock %}

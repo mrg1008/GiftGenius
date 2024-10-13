@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     google_id = db.Column(db.String(64), unique=True, nullable=True)
     referral_code = db.Column(db.String(10), unique=True)
     referred_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    referral_count = db.Column(db.Integer, default=0)  # New field for tracking referrals
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

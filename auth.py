@@ -93,8 +93,13 @@ def signup_post():
         referrer = User.query.filter_by(referral_code=referral_code).first()
         if referrer:
             referral = Referral(referrer_id=referrer.id, referred_id=new_user.id, date=datetime.utcnow())
+            referral.status = 'Completed'  # Mark the referral as completed
             db.session.add(referral)
+            
+            # Increment the referrer's referral count
+            referrer.referral_count += 1
             db.session.commit()
+            
             flash('You have been referred successfully!')
         else:
             flash('Invalid referral code. Continuing with registration.')
@@ -116,4 +121,5 @@ def login_google():
 @auth.route('/referral')
 @login_required
 def referral():
-    return render_template('referral.html', referral_code=current_user.referral_code)
+    referrals = Referral.query.filter_by(referrer_id=current_user.id).all()
+    return render_template('referral.html', referral_code=current_user.referral_code, referrals=referrals)
