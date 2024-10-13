@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Your Cart</h2>
+    <div id="cart-items">
+        <!-- Cart items will be dynamically populated here -->
+    </div>
+    <div class="mt-4">
+        <h4>Gift Options</h4>
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="gift-wrapping">
+            <label class="form-check-label" for="gift-wrapping">
+                Add Gift Wrapping ($5.00)
+            </label>
+        </div>
+        <div class="mb-3">
+            <label for="personalization" class="form-label">Add a personalized message</label>
+            <textarea class="form-control" id="personalization" rows="3" maxlength="256"></textarea>
+        </div>
+    </div>
+    <button id="checkout-btn" class="btn btn-primary mt-3">Proceed to Checkout</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch and display cart items
+    fetchCartItems();
+
+    // Handle checkout
+    document.getElementById('checkout-btn').addEventListener('click', function() {
+        const giftWrapping = document.getElementById('gift-wrapping').checked;
+        const personalization = document.getElementById('personalization').value;
+        
+        // Implement checkout logic here, including gift wrapping and personalization options
+        checkout(giftWrapping, personalization);
+    });
+});
+
+function fetchCartItems() {
+    // Implement logic to fetch and display cart items
+}
+
+function checkout(giftWrapping, personalization) {
+    // Implement checkout logic, including gift wrapping and personalization options
+    fetch('/order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            // Include other necessary data
+            gift_wrapping: giftWrapping,
+            personalization: personalization,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.purchase_url) {
+            window.location.href = data.purchase_url;
+        } else {
+            alert('Error placing order. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script>
+{% endblock %}

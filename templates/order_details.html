@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Order Details</h2>
+    <p><strong>Order ID:</strong> {{ order.amazon_order_id }}</p>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+    <p><strong>Event:</strong> {{ order.event.type }} on {{ order.event.date }}</p>
+    
+    <h3>Gift Options</h3>
+    <p><strong>Gift Wrapping:</strong> {% if order.gift_wrapping %}Yes{% else %}No{% endif %}</p>
+    {% if order.personalization %}
+    <p><strong>Personalized Message:</strong> {{ order.personalization }}</p>
+    {% endif %}
+
+    <h3>Items</h3>
+    <ul class="list-group">
+    {% for item in details.OrderItems %}
+        <li class="list-group-item">
+            <h5>{{ item.Title }}</h5>
+            <p>Price: {{ item.ItemPrice.Amount }} {{ item.ItemPrice.CurrencyCode }}</p>
+            <p>Quantity: {{ item.QuantityOrdered }}</p>
+        </li>
+    {% endfor %}
+    </ul>
+
+    <h3>Shipping</h3>
+    <p><strong>Address:</strong> {{ details.ShippingAddress.AddressLine1 }}, {{ details.ShippingAddress.City }}, {{ details.ShippingAddress.StateOrRegion }} {{ details.ShippingAddress.PostalCode }}</p>
+    <p><strong>Status:</strong> {{ details.OrderStatus }}</p>
+
+    {% if order.status == 'Delivered' and not order.feedback %}
+    <h3>Feedback</h3>
+    <form action="{{ url_for('feedback.submit_feedback', order_id=order.id) }}" method="POST">
+        <div class="mb-3">
+            <label for="rating" class="form-label">Rating (1-5)</label>
+            <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" required>
+        </div>
+        <div class="mb-3">
+            <label for="comment" class="form-label">Comment</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

@@ -33,6 +33,8 @@ def place_order():
     data = request.json
     event_id = data.get('event_id')
     items = data.get('items')  # List of Amazon product ASINs
+    gift_wrapping = data.get('gift_wrapping', False)
+    personalization = data.get('personalization', '')
 
     try:
         # Initialize Amazon Product Advertising API client
@@ -57,7 +59,9 @@ def place_order():
             amazon_order_id=cart_id,
             status='Pending',
             user_id=current_user.id,
-            event_id=event_id
+            event_id=event_id,
+            gift_wrapping=gift_wrapping,
+            personalization=personalization
         )
         db.session.add(new_order)
         db.session.commit()

@@ -31,6 +31,10 @@ args = "Google Shopping Integration Test"
 task = "workflow.run"
 args = "Test Recommendations"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Test Gift Options"
+
 [[workflows.workflow]]
 name = "Start Flask App"
 author = "agent"
@@ -86,6 +90,17 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python -m unittest test_recommendations.py"
+
+[[workflows.workflow]]
+name = "Test Gift Options"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python test_gift_options.py"
 
 [deployment]
 run = ["sh", "-c", "python main.py"]

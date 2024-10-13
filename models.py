@@ -43,6 +43,8 @@ class Order(db.Model):
     user = db.relationship('User', backref=db.backref('orders', lazy=True))
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     event = db.relationship('Event', backref=db.backref('orders', lazy=True))
+    gift_wrapping = db.Column(db.Boolean, default=False)
+    personalization = db.Column(db.String(256))
 
 class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
