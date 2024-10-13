@@ -41,4 +41,34 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Mobile-specific enhancements
+    if (window.innerWidth <= 992) {
+        // Close mobile menu when a link is clicked
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navbarCollapse.classList.remove('show');
+            });
+        });
+
+        // Add "Back to Top" button
+        const backToTopBtn = document.createElement('button');
+        backToTopBtn.innerHTML = '&uarr;';
+        backToTopBtn.className = 'btn btn-primary back-to-top';
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        document.body.appendChild(backToTopBtn);
+
+        // Show/hide "Back to Top" button based on scroll position
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+    }
 });

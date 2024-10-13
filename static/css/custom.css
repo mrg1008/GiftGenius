@@ -82,4 +82,63 @@ body {
     .card {
         margin-bottom: 1rem;
     }
+    
+    /* Improve touch targets for mobile */
+    .btn, .form-control, .nav-link {
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Adjust spacing for mobile */
+    .mt-4, .my-4 {
+        margin-top: 2rem !important;
+    }
+    
+    .mb-4, .my-4 {
+        margin-bottom: 2rem !important;
+    }
+    
+    /* Improve readability on mobile */
+    body {
+        font-size: 16px;
+    }
+    
+    /* Make images responsive */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* Add styles for a mobile-friendly navigation menu */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        background-color: var(--bs-gray-800);
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    .navbar-nav {
+        margin-top: 1rem;
+    }
+    
+    .nav-item {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Add styles for a mobile-friendly footer */
+footer {
+    background-color: var(--bs-gray-800);
+    padding: 2rem 0;
+    margin-top: 2rem;
+}
+
+@media (max-width: 576px) {
+    footer {
+        text-align: center;
+    }
+    
+    footer .col-sm-6 {
+        margin-bottom: 1rem;
+    }
 }
