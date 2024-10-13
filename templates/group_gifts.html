@@ -5,8 +5,35 @@
     <h2>Your Group Gifts</h2>
     <a href="{{ url_for('group_gifts.create_group_gift') }}" class="btn btn-primary mb-3">Create New Group Gift</a>
     
+    <h3>Group Gifts You Created</h3>
     <div class="row">
-        {% for gift in group_gifts %}
+        {% for gift in created_gifts %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ gift.name }}</h5>
+                    <p class="card-text">{{ gift.description[:100] }}{% if gift.description|length > 100 %}...{% endif %}</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Progress: ${{ "%.2f"|format(gift.current_amount) }} / ${{ "%.2f"|format(gift.target_amount) }}
+                        </small>
+                    </p>
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" style="width: {{ (gift.current_amount / gift.target_amount * 100)|round|int }}%;" 
+                             aria-valuenow="{{ (gift.current_amount / gift.target_amount * 100)|round|int }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ (gift.current_amount / gift.target_amount * 100)|round|int }}%
+                        </div>
+                    </div>
+                    <a href="{{ url_for('group_gifts.get_group_gift', group_gift_id=gift.id) }}" class="btn btn-info">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3 class="mt-5">Group Gifts You're Invited To</h3>
+    <div class="row">
+        {% for gift in invited_gifts %}
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
