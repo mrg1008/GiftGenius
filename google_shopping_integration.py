@@ -11,12 +11,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class GoogleShoppingIntegration:
-    def __init__(self):
+    def __init__(self, testing=False):
         self.credentials = None
         self.service = None
+        self.testing = testing
         self.setup_credentials()
 
     def setup_credentials(self):
+        if self.testing:
+            # Use mock credentials for testing
+            self.credentials = Credentials(token="mock_token")
+            self.service = build('content', 'v2.1', credentials=self.credentials)
+            return
+
         creds = None
         if os.path.exists('token.json'):
             creds = Credentials.from_authorized_user_file('token.json', ['https://www.googleapis.com/auth/content'])
@@ -25,6 +32,9 @@ class GoogleShoppingIntegration:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
+                if not os.path.exists('client_secrets.json'):
+                    logger.error("client_secrets.json not found. Please ensure it's in the project root.")
+                    return
                 flow = Flow.from_client_secrets_file(
                     'client_secrets.json',
                     scopes=['https://www.googleapis.com/auth/content']
@@ -38,6 +48,19 @@ class GoogleShoppingIntegration:
         self.service = build('content', 'v2.1', credentials=self.credentials)
 
     def search_gifts(self, keywords, min_price, max_price, limit=10):
+        if self.testing:
+            # Return mock data for testing
+            return [
+                {
+                    'title': f"Mock Gift {i}",
+                    'price': str(float(min_price) + i * 10),
+                    'currency_code': 'USD',
+                    'url': f"https://example.com/gift{i}",
+                    'image_url': f"https://example.com/image{i}.jpg",
+                    'source': 'Google Shopping'
+                } for i in range(limit)
+            ]
+
         try:
             query = ' '.join(keywords)
             request = self.service.products().list(
@@ -67,6 +90,18 @@ class GoogleShoppingIntegration:
             return []
 
     def get_gift_details(self, product_id):
+        if self.testing:
+            # Return mock data for testing
+            return {
+                'title': f"Mock Gift {product_id}",
+                'price': "99.99",
+                'currency_code': 'USD',
+                'url': f"https://example.com/gift{product_id}",
+                'image_url': f"https://example.com/image{product_id}.jpg",
+                'description': "This is a mock gift description",
+                'source': 'Google Shopping'
+            }
+
         try:
             request = self.service.products().get(
                 merchantId=Config.GOOGLE_SHOPPING_MERCHANT_ID,

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -50,6 +50,10 @@ def create_app():
     @app.route('/api/hello')
     def hello():
         return jsonify(message="Hello from Flask!")
+
+    @app.route('/home')
+    def home():
+        return render_template('home.html')
 
     from models import User
 
