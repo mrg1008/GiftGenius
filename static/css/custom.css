@@ -67,3 +67,19 @@ body {
         font-size: 1.5rem;
     }
 }
+
+/* Mobile-friendly adjustments */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .jumbotron {
+        padding: 1.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
