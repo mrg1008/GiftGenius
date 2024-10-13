@@ -1,20 +1,25 @@
+import os
+import logging
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer import oauth_authorized
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
-from models import User, db, Referral
+from models import User, Referral, db
 from datetime import datetime
 
 auth = Blueprint('auth', __name__)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def init_google_oauth(app):
     google_bp = make_google_blueprint(
         client_id=app.config.get("GOOGLE_OAUTH_CLIENT_ID"),
         client_secret=app.config.get("GOOGLE_OAUTH_CLIENT_SECRET"),
         scope=["profile", "email"],
-        storage=SQLAlchemyStorage(User, session=db.session)
+        storage=SQLAlchemyStorage(User, db.session)
     )
     app.register_blueprint(google_bp, url_prefix="/login")
 
@@ -58,7 +63,7 @@ def login_post():
 
     user = User.query.filter_by(email=email).first()
 
-    if not user or not user.check_password(password):
+    if not user or not check_password_hash(user.password_hash, password):
         flash('Please check your login details and try again.')
         return redirect(url_for('auth.login'))
 
@@ -71,40 +76,53 @@ def signup():
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
+    logger.info("Signup attempt received")
     email = request.form.get('email')
     name = request.form.get('name')
     password = request.form.get('password')
     referral_code = request.form.get('referral_code')
 
+    logger.info(f"Signup details - Email: {email}, Name: {name}, Referral Code: {referral_code}")
+
     user = User.query.filter_by(email=email).first()
 
     if user:
+        logger.info("Email address already exists")
         flash('Email address already exists')
         return redirect(url_for('auth.signup'))
 
-    new_user = User(email=email, name=name)
-    new_user.set_password(password)
-    new_user.generate_referral_code()
+    try:
+        new_user = User(email=email, name=name)
+        new_user.set_password(password)
+        new_user.generate_referral_code()
 
-    db.session.add(new_user)
-    db.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
 
-    if referral_code:
-        referrer = User.query.filter_by(referral_code=referral_code).first()
-        if referrer:
-            referral = Referral(referrer_id=referrer.id, referred_id=new_user.id, date=datetime.utcnow())
-            referral.status = 'Completed'  # Mark the referral as completed
-            db.session.add(referral)
-            
-            # Increment the referrer's referral count
-            referrer.referral_count += 1
-            db.session.commit()
-            
-            flash('You have been referred successfully!')
-        else:
-            flash('Invalid referral code. Continuing with registration.')
+        logger.info(f"New user created with ID: {new_user.id}")
 
-    return redirect(url_for('auth.login'))
+        if referral_code:
+            referrer = User.query.filter_by(referral_code=referral_code).first()
+            if referrer:
+                referral = Referral(referrer_id=referrer.id, referred_id=new_user.id, date=datetime.utcnow())
+                referral.status = 'Completed'
+                db.session.add(referral)
+                
+                referrer.referral_count += 1
+                db.session.commit()
+                
+                logger.info(f"Referral recorded for user {new_user.id} by referrer {referrer.id}")
+                flash('You have been referred successfully!')
+            else:
+                logger.info("Invalid referral code provided")
+                flash('Invalid referral code. Continuing with registration.')
+
+        return redirect(url_for('auth.login'))
+    except Exception as e:
+        logger.error(f"Error during user creation: {str(e)}")
+        db.session.rollback()
+        flash('An error occurred during registration. Please try again.')
+        return redirect(url_for('auth.signup'))
 
 @auth.route('/logout')
 @login_required

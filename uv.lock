@@ -829,8 +829,10 @@ dependencies = [
     { name = "numpy" },
     { name = "pandas" },
     { name = "psycopg2-binary" },
+    { name = "requests" },
     { name = "scikit-learn" },
     { name = "sqlalchemy" },
+    { name = "werkzeug" },
 ]
 
 [package.metadata]
@@ -855,8 +857,10 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.1.2" },
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "psycopg2-binary", specifier = ">=2.9.9" },
+    { name = "requests", specifier = ">=2.32.3" },
     { name = "scikit-learn", specifier = ">=1.5.2" },
     { name = "sqlalchemy", specifier = ">=2.0.35" },
+    { name = "werkzeug", specifier = ">=3.0.4" },
 ]
 
 [[package]]
