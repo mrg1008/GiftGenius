@@ -126,4 +126,4 @@ externalPort = 80
 
 [auth]
 pageEnabled = false
-buttonEnabled = false
+buttonEnabled = true
