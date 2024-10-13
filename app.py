@@ -39,6 +39,9 @@ def create_app():
     from feedback import feedback as feedback_blueprint
     app.register_blueprint(feedback_blueprint)
 
+    from group_gifts import group_gifts as group_gifts_blueprint
+    app.register_blueprint(group_gifts_blueprint)
+
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve(path):

@@ -50,3 +50,24 @@ class Feedback(db.Model):
     comment = db.Column(db.Text)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     order = db.relationship('Order', backref=db.backref('feedback', lazy=True))
+
+class GroupGift(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    event = db.relationship('Event', backref=db.backref('group_gifts', lazy=True))
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator = db.relationship('User', backref=db.backref('created_group_gifts', lazy=True))
+    target_amount = db.Column(db.Float, nullable=False)
+    current_amount = db.Column(db.Float, default=0)
+    status = db.Column(db.String(64), default='Active')
+
+class GroupGiftContribution(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    group_gift_id = db.Column(db.Integer, db.ForeignKey('group_gift.id'), nullable=False)
+    group_gift = db.relationship('GroupGift', backref=db.backref('contributions', lazy=True))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('group_gift_contributions', lazy=True))
+    amount = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)

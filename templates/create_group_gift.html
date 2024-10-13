@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create a New Group Gift</h2>
+    <form method="POST" action="{{ url_for('group_gifts.create_group_gift') }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Gift Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="event_id" class="form-label">Event</label>
+            <select class="form-select" id="event_id" name="event_id" required>
+                <option value="">Select an event</option>
+                {% for event in events %}
+                <option value="{{ event.id }}">{{ event.type }} - {{ event.date }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="target_amount" class="form-label">Target Amount</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" id="target_amount" name="target_amount" min="1" step="0.01" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Group Gift</button>
+    </form>
+</div>
+{% endblock %}
