@@ -5,6 +5,7 @@ from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_cors import CORS
 from sqlalchemy.orm import DeclarativeBase
+import ssl
 
 class Base(DeclarativeBase):
     pass
@@ -76,4 +77,6 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain('cert.pem', 'key.pem')
+    app.run(host="0.0.0.0", port=5000, ssl_context=context, debug=True)
