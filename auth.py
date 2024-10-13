@@ -4,7 +4,8 @@ from flask_login import login_user, login_required, logout_user, current_user
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer import oauth_authorized
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
-from models import User, db
+from models import User, db, Referral
+from datetime import datetime
 
 auth = Blueprint('auth', __name__)
 
@@ -73,6 +74,7 @@ def signup_post():
     email = request.form.get('email')
     name = request.form.get('name')
     password = request.form.get('password')
+    referral_code = request.form.get('referral_code')
 
     user = User.query.filter_by(email=email).first()
 
@@ -82,9 +84,20 @@ def signup_post():
 
     new_user = User(email=email, name=name)
     new_user.set_password(password)
+    new_user.generate_referral_code()
 
     db.session.add(new_user)
     db.session.commit()
+
+    if referral_code:
+        referrer = User.query.filter_by(referral_code=referral_code).first()
+        if referrer:
+            referral = Referral(referrer_id=referrer.id, referred_id=new_user.id, date=datetime.utcnow())
+            db.session.add(referral)
+            db.session.commit()
+            flash('You have been referred successfully!')
+        else:
+            flash('Invalid referral code. Continuing with registration.')
 
     return redirect(url_for('auth.login'))
 
@@ -99,3 +112,8 @@ def login_google():
     if not google.authorized:
         return redirect(url_for("google.login"))
     return redirect(url_for("main.profile"))
+
+@auth.route('/referral')
+@login_required
+def referral():
+    return render_template('referral.html', referral_code=current_user.referral_code)

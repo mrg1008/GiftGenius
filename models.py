@@ -1,6 +1,8 @@
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+import string
+import random
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -8,12 +10,21 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=True)
     name = db.Column(db.String(64), nullable=False)
     google_id = db.Column(db.String(64), unique=True, nullable=True)
+    referral_code = db.Column(db.String(10), unique=True)
+    referred_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def generate_referral_code(self):
+        characters = string.ascii_letters + string.digits
+        code = ''.join(random.choice(characters) for _ in range(10))
+        while User.query.filter_by(referral_code=code).first():
+            code = ''.join(random.choice(characters) for _ in range(10))
+        self.referral_code = code
 
 class Recipient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -73,3 +84,13 @@ class GroupGiftContribution(db.Model):
     user = db.relationship('User', backref=db.backref('group_gift_contributions', lazy=True))
     amount = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
+
+class Referral(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    referrer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    referred_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(64), default='Pending')  # Pending, Completed, Rewarded
+
+    referrer = db.relationship('User', foreign_keys=[referrer_id], backref=db.backref('referrals_made', lazy=True))
+    referred = db.relationship('User', foreign_keys=[referred_id], backref=db.backref('referral', uselist=False))
