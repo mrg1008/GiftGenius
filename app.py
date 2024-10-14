@@ -1,5 +1,6 @@
+
 import os
-from flask import Flask, send_from_directory, jsonify, render_template
+from flask import Flask, send_from_directory, jsonify, render_template, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
@@ -15,7 +16,7 @@ login_manager = LoginManager()
 migrate = Migrate()
 
 def create_app():
-    app = Flask(__name__, static_folder='frontend/build', static_url_path='')
+    app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object('config.Config')
 
     CORS(app)
@@ -50,21 +51,21 @@ def create_app():
         if current_user.is_authenticated:
             analytics.track_page_view(current_user.id)
 
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def serve(path):
-        if path != "" and os.path.exists(app.static_folder + '/' + path):
-            return send_from_directory(app.static_folder, path)
-        else:
-            return send_from_directory(app.static_folder, 'index.html')
+    @app.route('/')
+    def index():
+        return render_template('home.html')
+
+    @app.route('/static/<path:path>')
+    def serve_static(path):
+        return send_from_directory(app.static_folder, path)
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html'), 404
 
     @app.route('/api/hello')
     def hello():
         return jsonify(message="Hello from Flask!")
-
-    @app.route('/home')
-    def home():
-        return render_template('home.html')
 
     from models import User
 
@@ -77,6 +78,6 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain('cert.pem', 'key.pem')
-    app.run(host="0.0.0.0", port=5000, ssl_context=context, debug=True)
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context.load_cert_chain('cert.pem', 'key.pem')
+    app.run(host="0.0.0.0", port=5000, ssl_context=ssl_context, debug=True)

@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import string
 import random
+from datetime import datetime
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,7 +13,8 @@ class User(UserMixin, db.Model):
     google_id = db.Column(db.String(64), unique=True, nullable=True)
     referral_code = db.Column(db.String(10), unique=True)
     referred_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    referral_count = db.Column(db.Integer, default=0)  # New field for tracking referrals
+    referral_count = db.Column(db.Integer, default=0)
+    provider = db.Column(db.String(20), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -27,14 +29,15 @@ class User(UserMixin, db.Model):
             code = ''.join(random.choice(characters) for _ in range(10))
         self.referral_code = code
 
-class Recipient(db.Model):
+class Referral(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
-    age_group = db.Column(db.String(20), nullable=False)
-    interests = db.Column(db.String(256))
-    relationship = db.Column(db.String(64))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('recipients', lazy=True))
+    referrer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    referred_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    status = db.Column(db.String(64), default='Pending')
+
+    referrer = db.relationship('User', foreign_keys=[referrer_id], backref=db.backref('referrals_made', lazy=True))
+    referred = db.relationship('User', foreign_keys=[referred_id], backref=db.backref('referral', uselist=False))
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,6 +49,15 @@ class Event(db.Model):
     recipient = db.relationship('Recipient', backref=db.backref('events', lazy=True))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('events', lazy=True))
+
+class Recipient(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    age_group = db.Column(db.String(20), nullable=False)
+    interests = db.Column(db.String(256))
+    relationship = db.Column(db.String(64))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('recipients', lazy=True))
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -84,14 +96,4 @@ class GroupGiftContribution(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('group_gift_contributions', lazy=True))
     amount = db.Column(db.Float, nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
-
-class Referral(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    referrer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    referred_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(64), default='Pending')  # Pending, Completed, Rewarded
-
-    referrer = db.relationship('User', foreign_keys=[referrer_id], backref=db.backref('referrals_made', lazy=True))
-    referred = db.relationship('User', foreign_keys=[referred_id], backref=db.backref('referral', uselist=False))
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

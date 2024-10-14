@@ -19,7 +19,7 @@ def init_google_oauth(app):
         client_id=app.config.get("GOOGLE_OAUTH_CLIENT_ID"),
         client_secret=app.config.get("GOOGLE_OAUTH_CLIENT_SECRET"),
         scope=["profile", "email"],
-        storage=SQLAlchemyStorage(User, db.session)
+        storage=SQLAlchemyStorage(User, db.session, user=current_user)
     )
     app.register_blueprint(google_bp, url_prefix="/login")
 
@@ -38,10 +38,12 @@ def init_google_oauth(app):
                         user = User(
                             name=google_info["name"],
                             email=google_info["email"],
-                            google_id=google_user_id
+                            google_id=google_user_id,
+                            provider="google"
                         )
                     else:
                         user.google_id = google_user_id
+                        user.provider = "google"
                     db.session.add(user)
                     db.session.commit()
                 login_user(user)
@@ -92,7 +94,7 @@ def signup_post():
         return redirect(url_for('auth.signup'))
 
     try:
-        new_user = User(email=email, name=name)
+        new_user = User(email=email, name=name, provider="local")
         new_user.set_password(password)
         new_user.generate_referral_code()
 
